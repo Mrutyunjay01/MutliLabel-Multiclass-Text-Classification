@@ -46,7 +46,7 @@ def build_model(max_len, max_features, embed_size, attn_units=20, num_classes=4,
 
     fc_pre = Dense(num_classes * 4, activation="relu")(context)
     do = Dropout(0.05)(fc_pre)
-    output = Dense(num_classes, activation="sigmoid")(do)
+    output = Dense(num_classes, activation="softmax")(do)
 
     return keras.Model(inputs=seq_inp, outputs=output)
     pass

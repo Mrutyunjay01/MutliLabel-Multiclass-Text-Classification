@@ -14,10 +14,13 @@ from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 
 from models.lstmAttention import build_model
+from models.custom_full_attention_layer_with_bidirectional_lstm import build_ABDLstm_model
+from models.transformer import build_transformer_model
+from losses.loss_functions import FocalLoss
 
-MAXLEN = 75
-MAXWORDS = 5000
-EMBED_SIZE = 100
+MAXLEN = 254
+VOCAB_SIZE = 20000
+EMBED_DIM = 128
 BATCH_SIZE = 128
 EPOCHS = 5
 CLASSES = 198
@@ -30,7 +33,6 @@ apply_class_weights = True
 if __name__ == '__main__':
 
     # load the preprocessed df directly
-
     df = pd.read_csv("./working_chapters.csv")
     df.dropna(inplace=True)
     df.reset_index(drop=True)
@@ -41,7 +43,7 @@ if __name__ == '__main__':
     print("Length of test: ", len(test))
     # Use train to crate further validation set
     # tokenize the sentences
-    tokenizer = Tokenizer(num_words=MAXWORDS, filters='!"#$&(),.:;?@[\\]^_`{|}\t\n')
+    tokenizer = Tokenizer(num_words=VOCAB_SIZE, filters='!"#$&(),.:;?@[\\]^_`{|}\t\n')
     tokenizer.fit_on_texts(list(train[TEXT_COL]) + list(test[TEXT_COL]))
     word_idx = tokenizer.word_index
 
@@ -63,8 +65,10 @@ if __name__ == '__main__':
     test_preds = np.zeros((X_test.shape[0], CLASSES))
 
     print("====== Build and compile the model ========")
-    model = build_model(max_len=MAXLEN, max_features=MAXWORDS, embed_size=EMBED_SIZE, num_classes=CLASSES)
-    model.compile(loss="categorical_crossentropy",
+    # model = build_model(max_len=MAXLEN, max_features=MAXWORDS, embed_size=EMBED_SIZE, num_classes=CLASSES)
+    # model = build_transformer_model(n_classes=CLASSES)
+    model = build_ABDLstm_model(n_classes=CLASSES, max_len=MAXLEN, vocab_size=VOCAB_SIZE)
+    model.compile(loss=FocalLoss,
                   optimizer="adam",
                   metrics=["accuracy"])
 
