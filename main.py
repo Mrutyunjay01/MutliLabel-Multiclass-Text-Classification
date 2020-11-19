@@ -30,10 +30,9 @@ TARGET_COL = "target"
 
 apply_class_weights = True
 
-if __name__ == '__main__':
 
+def main(df):
     # load the preprocessed df directly
-    df = pd.read_csv("./working_chapters.csv")
     df.dropna(inplace=True)
     df.reset_index(drop=True)
     assert len(df.columns) == 2, "Dataframe with text and target col only is allowed, check you df"
@@ -97,12 +96,15 @@ if __name__ == '__main__':
     print("Training Finished...")
     print("Performance in training Data...")
     oof_pred = K.argmax(oof_preds).numpy()
-    print("ROC-AUC Score for training: ", roc_auc_score(y_true=y_train, y_score=oof_pred))
-    print()
     print("Classification report for training: ", classification_report(y_true=y_train, y_pred=oof_pred))
 
     print("Evaluation on test data...")
     y_pred = K.argmax(test_preds).numpy()
     print("Classification report for training: ", classification_report(y_true=y_test, y_pred=y_pred))
-    print("ROC-AUC Score for testing: ", roc_auc_score(y_true=y_test, y_score=y_pred))
+    pass
+
+
+if __name__ == '__main__':
+    df = pd.read_csv("working_chapters.csv")
+    main(df)
     pass
